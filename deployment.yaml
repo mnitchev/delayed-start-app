@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signal-deployment
+  labels:
+    app: signal
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: signal
+  template:
+    metadata:
+      labels:
+        app: signal
+    spec:
+      containers:
+      - name: signal
+        image: mnitchev/signal:v1
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: signal-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: signal
+
